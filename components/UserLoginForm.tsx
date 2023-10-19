@@ -88,7 +88,7 @@ export default function UserLoginForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full space-y-4 my-12 border-muted border-2 p-8 rounded-lg max-w-2xl"
+        className="w-full space-y-4 mt-8 mb-12 border-muted border-2 p-8 rounded-lg max-w-2xl"
       >
         <FormField
           control={form.control}
