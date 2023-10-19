@@ -10,8 +10,8 @@ export default function NavBar() {
         <ul className="flex items-center justify-between">
           <li>
             <div className="pointer-events-none flex place-items-center gap-2 p-8">
-              <BiCameraMovie size={24} />
-              <h1 className="font-bold">CinemaBudy</h1>
+              <BiCameraMovie size={30} />
+              <p className="text-2xl font-bold">CinemaBudy</p>
             </div>
           </li>
           <li className="p-8">

@@ -1,7 +1,15 @@
-import { Button } from "@/components/ui/button";
-import prisma from "@/lib/prisma";
+"use client";
 
-export default async function Home() {
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+
+export default function Home() {
+  const router = useRouter();
+
+  const handleSignUpClick = () => {
+    router.push("/login");
+  };
+
   return (
     <main className="px-24 pb-24">
       <section className="py-12 flex flex-col items-center text-center gap-8">
@@ -10,9 +18,13 @@ export default async function Home() {
           You will never buy twice wrong seats in cinema.
         </p>
       </section>
-      <div className="flex gap-6 items-center justify-center">
-        <Button variant={"secondary"}>Learn More</Button>
-        <Button>Sign Up Now</Button>
+      <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-center">
+        <Button className="w-32" variant={"secondary"}>
+          Learn More
+        </Button>
+        <Button onClick={handleSignUpClick} className="w-32">
+          Sign Up Now
+        </Button>
       </div>
     </main>
   );
