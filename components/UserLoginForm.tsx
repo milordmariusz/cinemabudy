@@ -95,7 +95,7 @@ export default function UserLoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="Email" {...field} />
               </FormControl>

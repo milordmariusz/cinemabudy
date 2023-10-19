@@ -1,52 +1,97 @@
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import Cookies from "js-cookie";
 
 export async function POST(request) {
-  const { email, password } = await request.json();
+  const { email, password, name } = await request.json();
+
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (existingUser) {
+    return new Response(JSON.stringify({ error: "Email already in use" }), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      status: 400,
+    });
+  }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
         email,
+        password: hashedPassword,
+        name,
       },
     });
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
+    return new Response(
+      JSON.stringify({ message: "User Created", user: newUser }),
+      {
         headers: {
           "Content-Type": "application/json",
         },
-        status: 404,
-      });
-    }
+        status: 201,
+      }
+    );
+  } catch (error) {
+    return new Response(JSON.stringify({ error: "User creation failed" }), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      status: 500,
+    });
+  }
+}
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+export async function GET() {
+  try {
+    const allUsers = await prisma.user.findMany();
 
-    if (passwordMatch) {
-      const token = jwt.sign({ userId: user.id }, "your-secret-key", {
-        expiresIn: "1h",
-      });
+    return new Response(JSON.stringify({ users: allUsers }), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      status: 200,
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: "Failed to retrieve users" }), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      status: 500,
+    });
+  }
+}
 
-      Cookies.set("token", token, { expires: 1 / 24 });
+export async function DELETE(request) {
+  const id = request.nextUrl.searchParams.get("id");
+  console.log(id);
 
-      return new Response(JSON.stringify({ message: "Login successful" }), {
+  try {
+    const deletedUser = await prisma.user.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return new Response(
+      JSON.stringify({ message: "User Deleted", deletedUser }),
+      {
         headers: {
           "Content-Type": "application/json",
         },
         status: 200,
-      });
-    } else {
-      return new Response(JSON.stringify({ error: "Login failed" }), {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        status: 401,
-      });
-    }
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Login failed" }), {
+    console.log(error);
+    return new Response(JSON.stringify({ error: "Failed to delete user" }), {
       headers: {
         "Content-Type": "application/json",
       },
