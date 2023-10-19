@@ -16,6 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { useRouter } from "next/navigation";
+import jwt from "jsonwebtoken";
+
+interface JwtPayload {
+  userId: number;
+  iat: number;
+  exp: number;
+}
 
 const formSchema = z.object({
   email: z
@@ -40,6 +48,7 @@ const formSchema = z.object({
 
 export default function UserLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -53,9 +62,27 @@ export default function UserLoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof formSchema>, e: any) => {
+    const { email, password } = values;
+
+    try {
+      const res = await fetch("http://localhost:3000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.ok) {
+        router.push("/main/user-page");
+      } else {
+        throw new Error("Failed to login");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Form {...form}>
