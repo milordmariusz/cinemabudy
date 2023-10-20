@@ -4,9 +4,9 @@ import bcrypt from "bcrypt";
 export async function POST(request) {
   const { email, password, name } = await request.json();
 
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.user.findFirst({
     where: {
-      email,
+      email: email,
     },
   });
 
@@ -49,7 +49,9 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
+  const cookies = request.cookies;
+
   try {
     const allUsers = await prisma.user.findMany();
 

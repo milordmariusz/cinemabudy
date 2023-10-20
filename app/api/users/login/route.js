@@ -10,9 +10,9 @@ export async function POST(request) {
   const { email, password } = await request.json();
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
-        email,
+        email: email,
       },
     });
 
@@ -41,9 +41,15 @@ export async function POST(request) {
         path: "/",
       });
 
-      return new Response(JSON.stringify({ message: "Login successful" }), {
+      const responseJSON = JSON.stringify({
+        message: "Login successful",
+        token: token,
+      });
+
+      return new Response(responseJSON, {
         headers: {
           "Set-Cookie": serialized,
+          "Content-Type": "application/json",
         },
         status: 200,
       });
